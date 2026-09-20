@@ -29,6 +29,34 @@
   const first = document.querySelector('.hero-first');
   const second = document.querySelector('.hero-second');
   const parallax = [...document.querySelectorAll('.image-statement')];
+  // Keep words intact when wrapping, and reveal the hero letter by letter as
+  // the reader scrolls. One accessible label avoids fragmented screen-reader text.
+  const splitText = (element, letters=false) => {
+    const label=element.innerHTML.replace(/<br\s*\/?\s*>/gi,' ').replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim();
+    const parts=element.innerHTML.split(/(<br\s*\/?\s*>)/gi);
+    element.setAttribute('aria-label',label);
+    element.replaceChildren();
+    const units=[];
+    parts.forEach(part=>{
+      if (/^<br/i.test(part)) { element.append(document.createElement('br')); return; }
+      part.split(/(\s+)/).filter(Boolean).forEach(word=>{
+        if (/^\s+$/.test(word)) { element.append(document.createTextNode(' ')); return; }
+        const span=document.createElement('span');span.className='motion-word';span.setAttribute('aria-hidden','true');
+        if (letters) [...word].forEach(letter=>{const char=document.createElement('span');char.className='motion-letter';char.textContent=letter;span.append(char);units.push(char);});
+        else {span.textContent=word;units.push(span);}
+        element.append(span);
+      });
+    });
+    return units;
+  };
+  const heroWords=document.querySelector('[data-hero-words]');
+  const heroLetters=heroWords?splitText(heroWords,true):[];
+  const textReveals=[...document.querySelectorAll('[data-scroll-words]')].map(element=>({element,units:splitText(element)}));
+  const comparisonScene=document.querySelector('.comparison-scene');
+  const comparison=document.querySelector('.comparison');
+  const serviceCards=[...document.querySelectorAll('.service-card')];
+  const methodSteps=[...document.querySelectorAll('.method-step')];
+  const desktopMotion=window.matchMedia('(min-width: 801px)');
   const clamp = (n, min=0, max=1) => Math.max(min, Math.min(max, n));
   let requested = false;
   const paint = () => {
@@ -38,20 +66,52 @@
     if (story && stage) {
       const rect = story.getBoundingClientRect();
       const travel = Math.max(1, story.offsetHeight - stage.offsetHeight);
-      const p = clamp((12 - rect.top) / travel);
-      const fade = clamp((p - .06) / .31);
-      const arrival = clamp((p - .24) / .3);
+      const p = clamp(-rect.top / travel);
+      const fade = clamp((p - .015) / .19);
+      const arrival = clamp((p - .23) / .12);
       stage.style.setProperty('--first-opacity', (1-fade).toFixed(3));
-      stage.style.setProperty('--first-y', `${-70*fade}px`);
+      stage.style.setProperty('--first-y', `${-45*fade}px`);
       stage.style.setProperty('--second-opacity', arrival.toFixed(3));
-      stage.style.setProperty('--second-y', `${55*(1-arrival)}px`);
-      stage.style.setProperty('--hero-scale', (1.02 + p*.1).toFixed(3));
-      stage.style.setProperty('--hero-blur', `${p*7}px`);
-      stage.style.setProperty('--shade', (.24+p*.35).toFixed(3));
+      stage.style.setProperty('--second-y', '0px');
+      stage.style.setProperty('--hero-scale', (1.02 + p*.075).toFixed(3));
+      stage.style.setProperty('--hero-blur', `${clamp((p-.14)/.23)*10}px`);
+      stage.style.setProperty('--shade', (.22+clamp(p/.36)*.23).toFixed(3));
+      stage.style.setProperty('--hero-expand', clamp(p/.16).toFixed(3));
       stage.style.setProperty('--progress', `${p*100}%`);
+      const reading=clamp((p-.26)/.39);
+      heroLetters.forEach((letter,i)=>{
+        const reveal=clamp(reading*(heroLetters.length+7)-i,0,7)/7;
+        letter.style.opacity=(.07+.93*reveal).toFixed(3);
+        letter.style.filter=`blur(${((1-reveal)*9).toFixed(2)}px)`;
+      });
       first.inert = fade > .98;
       second.setAttribute('aria-hidden', String(arrival < .35));
     }
+    textReveals.forEach(({element,units})=>{
+      const rect=element.getBoundingClientRect();
+      if(rect.top>innerHeight || rect.bottom<0)return;
+      const p=clamp((innerHeight*.9-rect.top)/(innerHeight*.46));
+      units.forEach((unit,i)=>{
+        const reveal=clamp(p*(units.length+3)-i,0,3)/3;
+        unit.style.opacity=(.22+.78*reveal).toFixed(3);
+        unit.style.filter=`blur(${((1-reveal)*3).toFixed(2)}px)`;
+      });
+    });
+    if(comparisonScene && comparison){
+      const rect=comparisonScene.getBoundingClientRect();
+      const p=desktopMotion.matches?clamp((110-rect.top)/(comparisonScene.offsetHeight-comparison.offsetHeight)*1.6):1;
+      comparison.style.setProperty('--spread',p.toFixed(3));
+    }
+    serviceCards.forEach((card,i)=>{
+      const next=serviceCards[i+1];
+      const p=desktopMotion.matches && next?clamp((innerHeight*.75-next.getBoundingClientRect().top)/(innerHeight*.75-110)):0;
+      card.style.setProperty('--stack-scale',(1-.035*p).toFixed(3));
+      card.style.setProperty('--stack-brightness',(1-.12*p).toFixed(3));
+    });
+    methodSteps.forEach(step=>{
+      const p=clamp((innerHeight*.85-step.getBoundingClientRect().top)/(innerHeight*.5));
+      step.style.setProperty('--step-progress',p.toFixed(3));
+    });
     parallax.forEach(section => {
       const rect = section.getBoundingClientRect();
       if (rect.bottom > 0 && rect.top < innerHeight) section.style.setProperty('--parallax', `${clamp((innerHeight/2-rect.top-rect.height/2)*.09,-45,45)}px`);
@@ -63,6 +123,10 @@
   window.addEventListener('pageshow', schedule);
   reducedMotion.addEventListener('change', () => {
     if (reducedMotion.matches) { document.body.classList.remove('motion-ready'); if (first) first.inert=false; second?.setAttribute('aria-hidden', 'true'); }
+    else {
+      document.querySelectorAll('.reveal').forEach(element => element.classList.add('is-visible'));
+      document.body.classList.add('motion-ready');
+    }
     schedule();
   });
   paint();
