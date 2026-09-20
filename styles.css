@@ -37,3 +37,7 @@
 @media(prefers-reduced-motion:reduce){.hero-story{height:auto}.hero-stage{width:100%;margin-left:0;height:auto;min-height:740px;border-radius:30px;position:relative}.hero-first{min-height:740px}.hero-second{display:none}.motion-word,.motion-letter{opacity:1!important;filter:none!important;transform:none!important}.comparison-scene{height:auto}.comparison{position:static;--spread:1!important}.comparison-card{transform:none!important}.service-card{transform:none!important;filter:none!important}.method-step{opacity:1!important}.method-step:before{transform:none}}
 /* Readable static layout when motion enhancement is unavailable. */
 body:not(.motion-ready) .hero-story{height:auto}body:not(.motion-ready) .hero-stage{position:relative;height:auto;width:100%;margin-left:0}body:not(.motion-ready) .hero-first{min-height:740px;opacity:1;transform:none;filter:none}body:not(.motion-ready) .hero-second{display:none}body:not(.motion-ready) .comparison-scene{height:auto}body:not(.motion-ready) .comparison{position:static}body:not(.motion-ready) .comparison-card{transform:none!important}body:not(.motion-ready) .motion-word,body:not(.motion-ready) .motion-letter{opacity:1!important;filter:none!important}
+
+/* Compact footer without the oversized wordmark. */
+.footer{padding-bottom:32px}
+@media(max-width:540px){.footer{padding-bottom:24px}}
