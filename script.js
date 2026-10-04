@@ -166,8 +166,25 @@
     const preview=document.querySelector('.message-preview');
     const status=document.querySelector('[data-form-status]');
     let message='';
+    const suggestedDate=form.elements.preferred_date;
+    const suggestedTime=form.elements.preferred_time;
+    const madridClock=()=>Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Madrid',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));
+    const dateString=parts=>`${parts.year}-${parts.month}-${parts.day}`;
+    if(suggestedDate){
+      suggestedDate.min=dateString(madridClock());
+      [suggestedDate,suggestedTime].forEach(input=>input.addEventListener('input',()=>{
+        suggestedDate.setCustomValidity('');suggestedTime.setCustomValidity('');
+      }));
+    }
     form.addEventListener('submit', event => {
-      event.preventDefault(); if (!form.reportValidity()) return;
+      event.preventDefault();
+      if(suggestedDate){
+        const now=madridClock();
+        suggestedDate.min=dateString(now);
+        if(suggestedTime.value && !suggestedDate.value) suggestedDate.setCustomValidity(say('Indica también una fecha para la hora propuesta.','Please include a date for your suggested time.'));
+        if(suggestedDate.value===dateString(now) && suggestedTime.value && suggestedTime.value<=`${now.hour}:${now.minute}`) suggestedTime.setCustomValidity(say('Propón una hora posterior a la actual en Barcelona.','Suggest a time later than the current Barcelona time.'));
+      }
+      if (!form.reportValidity()) return;
       const data=new FormData(form);
       const name=String(data.get('name')||'').trim();
       const email=String(data.get('email')||'').trim();
@@ -178,7 +195,11 @@
         invalid.setCustomValidity(say('Escribe una respuesta para poder preparar el mensaje.','Please enter an answer so we can prepare the message.'));
         invalid.reportValidity(); invalid.addEventListener('input',()=>invalid.setCustomValidity(''),{once:true}); return;
       }
-      message=`${say('Hola, Orquivia:','Hello, Orquivia:')}\n\n${say('Soy','I’m')} ${name}, ${company}.\n${say('Email de contacto','Contact email')}: ${email}\n\n${say('Me gustaría conversar sobre','I’d like to discuss')}: ${data.getAll('focus').join(', ') || say('mi proyecto','my project')}.\n\n${question}\n\n${say('Podemos concretar una primera conversación.','Let’s arrange an initial conversation.')}\n${name}`;
+      const proposedDate=String(data.get('preferred_date')||'');
+      const proposedTime=String(data.get('preferred_time')||'');
+      const dateLabel=proposedDate?new Intl.DateTimeFormat(english?'en-GB':'es-ES',{dateStyle:'long',timeZone:'Europe/Madrid'}).format(new Date(`${proposedDate}T12:00:00Z`)):'';
+      const schedule=proposedDate?`\n\n${say('Fecha propuesta para una llamada de 15 minutos','Suggested date for a 15-minute call')}: ${dateLabel}${proposedTime?' · '+proposedTime:''} (${say('hora de Barcelona','Barcelona time')}).\n${say('Pendiente de confirmación por correo.','Subject to confirmation by email.')}`:'';
+      message=`${say('Hola, Orquivia:','Hello, Orquivia:')}\n\n${say('Soy','I’m')} ${name}, ${company}.\n${say('Email de contacto','Contact email')}: ${email}\n\n${say('Me gustaría conversar sobre','I’d like to discuss')}: ${data.getAll('focus').join(', ') || say('mi proyecto','my project')}.\n\n${question}${schedule}\n\n${say('Podemos concretar una primera conversación.','Let’s arrange an initial conversation.')}\n${name}`;
       preview.textContent=message;
       document.querySelector('[data-mail-link]').href=`mailto:info@orquivia.com?subject=${encodeURIComponent(say('Conversemos sobre ','Let’s discuss ')+company)}&body=${encodeURIComponent(message)}`;
       form.hidden=true;review.hidden=false;status.textContent='';
