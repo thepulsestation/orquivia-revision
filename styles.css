@@ -43,6 +43,37 @@ body:not(.motion-ready) .hero-story{height:auto}body:not(.motion-ready) .hero-st
 @media(max-width:540px){.footer{padding-bottom:24px}}
 
 /* Concrete applications, using the site's existing editorial palette. */
+/* Diagrams describe the work without staging client photos or product screenshots. */
+.hero-stage{background:#243b3a}
+.honest-hero-art{background:linear-gradient(115deg,#263f3e,#1a2b32);overflow:hidden}
+.honest-hero-art span{position:absolute;width:55vw;height:55vw;min-width:550px;min-height:550px;right:-12vw;top:0;border:1px solid #e2ead724;border-radius:50%;transform:rotate(-18deg)}
+.honest-hero-art span:nth-child(2){right:-21vw;top:14%;border-color:#d7b46150}
+.honest-hero-art span:nth-child(3){right:-3vw;top:30%;border-color:#dbe6de25}
+.hero-copy{max-width:1050px}
+.hero-copy h1{font-size:clamp(48px,5.4vw,86px);line-height:1.05}
+.hero-copy>p:not(.eyebrow){max-width:670px;font-size:clamp(16px,1.35vw,20px)}
+.hero-feature{width:320px;padding:20px 25px;min-height:110px}
+.hero-feature>span{padding:0;gap:10px}
+.hero-feature .icon{display:none}
+.text-hero{background:var(--sage);color:var(--ink);min-height:560px;align-items:flex-end}
+.text-hero .page-hero-copy{position:relative;max-width:1100px;padding-top:95px;padding-bottom:60px}
+.text-hero .page-hero-copy h1{max-width:1000px}
+.text-hero .page-hero-copy>p{color:var(--muted);max-width:670px}
+.text-hero .page-hero-index{color:var(--muted)}
+.service-photo{display:flex;align-items:center;background:#f7f5ed}
+.service-photo>.process-diagram{height:auto;min-height:0;object-fit:contain}
+.experience-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line)}
+.experience-card{padding:34px 28px 15px 0;display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.experience-card+.experience-card{border-left:1px solid var(--line);padding-left:28px}
+.experience-card h3{font-size:clamp(26px,2.3vw,36px);line-height:1.18;margin-bottom:24px}
+.experience-card>p{font-size:15px;line-height:1.8;color:var(--muted);margin-bottom:28px}
+.experience-card>.button{margin-top:auto}
+.experience-grid.single{grid-template-columns:1fr;max-width:850px}
+.detail-layout aside>.process-diagram{width:100%;border-radius:20px;margin-bottom:28px}
+.article-cover .process-diagram,.case-cover .process-diagram,.application-card .process-diagram,.case-visual .process-diagram{object-fit:contain;background:#f5f2e9}
+.connection-note{padding-top:0;padding-bottom:20px}
+@media(max-width:800px){.experience-grid{grid-template-columns:1fr}.experience-card{padding:32px 0}.experience-card+.experience-card{border-left:0;border-top:1px solid var(--line);padding-left:0}.hero-copy h1{font-size:clamp(46px,7.5vw,64px)}.service-photo{min-height:300px}.text-hero{min-height:500px}.text-hero .page-hero-copy{padding-top:80px;padding-bottom:65px}.experience-card>p{font-size:16px}}
+@media(max-width:540px){.hero-stage{min-height:800px}.hero-first{padding-top:135px}.hero-copy h1{font-size:43px}.hero-copy>p:not(.eyebrow){font-size:16px;line-height:1.6}.hero-feature{display:none}.hero-actions .button{font-size:12px;min-height:48px;padding:12px 20px}.text-hero .page-hero-copy h1{font-size:45px}.text-hero .page-hero-copy>p{font-size:16px}.service-photo{min-height:230px}}
 .use-case-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
 .use-case-card{padding:32px;border:1px solid var(--line);border-radius:24px;background:#fffdf8;display:flex;flex-direction:column;min-width:0}
 .use-case-card:nth-child(2){background:#edf1eb}
