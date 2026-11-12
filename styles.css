@@ -69,6 +69,8 @@ body:not(.motion-ready) .hero-story{height:auto}body:not(.motion-ready) .hero-st
 .experience-card>p{font-size:15px;line-height:1.8;color:var(--muted);margin-bottom:28px}
 .experience-card>.button{margin-top:auto}
 .experience-grid.single{grid-template-columns:1fr;max-width:850px}
+.home-experience-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:800px){.home-experience-grid{grid-template-columns:1fr}}
 .detail-layout aside>.process-diagram{width:100%;border-radius:20px;margin-bottom:28px}
 .article-cover .process-diagram,.case-cover .process-diagram,.application-card .process-diagram,.case-visual .process-diagram{object-fit:contain;background:#f5f2e9}
 .connection-note{padding-top:0;padding-bottom:20px}
