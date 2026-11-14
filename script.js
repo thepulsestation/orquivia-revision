@@ -99,7 +99,8 @@
     });
     if(comparisonScene && comparison){
       const rect=comparisonScene.getBoundingClientRect();
-      const p=desktopMotion.matches?clamp((110-rect.top)/(comparisonScene.offsetHeight-comparison.offsetHeight)*1.6):1;
+      // Reveal as the cards enter the viewport, without reserving an empty scroll stage.
+      const p=desktopMotion.matches?clamp((innerHeight*.94-rect.top)/Math.max(1,innerHeight*.54)):1;
       comparison.style.setProperty('--spread',p.toFixed(3));
     }
     serviceCards.forEach((card,i)=>{
