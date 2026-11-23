@@ -166,6 +166,28 @@
     const review=document.querySelector('.form-review');
     const preview=document.querySelector('.message-preview');
     const status=document.querySelector('[data-form-status]');
+    const topicOptions = [...form.querySelectorAll('[data-topic]')];
+    const requestedTopics = new URLSearchParams(window.location.search).getAll('tema');
+    const hint = form.querySelector('#message-hint');
+    const genericHint = hint.textContent;
+    const languageLink = document.querySelector('.language-link');
+    function updateTopicContext() {
+      const selected = topicOptions.filter(option => option.checked);
+      hint.textContent = selected.length === 1 ? selected[0].dataset.prompt : genericHint;
+      if (languageLink) {
+        const translated = new URL(languageLink.href);
+        translated.searchParams.delete('tema');
+        selected.forEach(option => translated.searchParams.append('tema', option.dataset.topic));
+        translated.hash = ['#agenda', '#formulario'].includes(location.hash) ? location.hash : selected.length ? '#formulario' : '';
+        languageLink.href = translated.href;
+      }
+    }
+    topicOptions.forEach(option => {
+      if (requestedTopics.includes(option.dataset.topic)) option.checked = true;
+      option.addEventListener('change', updateTopicContext);
+    });
+    window.addEventListener('hashchange', updateTopicContext);
+    updateTopicContext();
     let message='';
     const suggestedDate=form.elements.preferred_date;
     const suggestedTime=form.elements.preferred_time;
@@ -207,11 +229,12 @@
       review.querySelector('h2').focus({preventScroll:true});
       review.scrollIntoView({behavior:reducedMotion.matches?'instant':'smooth',block:'center'});
     });
-    document.querySelector('[data-edit-message]').addEventListener('click',()=>{ review.hidden=true;form.hidden=false;form.elements.name.focus(); });
+    document.querySelector('[data-edit-message]').addEventListener('click',()=>{ review.hidden=true;form.hidden=false;form.elements.message.focus(); });
     document.querySelector('[data-copy-message]').addEventListener('click',async()=>{
       try { await navigator.clipboard.writeText(message); status.textContent=say('Mensaje copiado. Puedes pegarlo en tu correo y enviarlo a info@orquivia.com.','Message copied. Paste it into your email and send it to info@orquivia.com.'); }
       catch { const selection=window.getSelection();const range=document.createRange();range.selectNodeContents(preview);selection.removeAllRanges();selection.addRange(range);status.textContent=say('Seleccionamos el mensaje. Usa Copiar en tu dispositivo.','The message is selected. Use Copy on your device.'); }
     });
     document.querySelector('[data-mail-link]').addEventListener('click',()=>{ status.textContent=say('Se solicitará abrir tu aplicación de correo. El envío lo confirmas allí.','Your email app will be requested. Confirm sending there.'); });
+    form.hidden = false;
   }
 })();
